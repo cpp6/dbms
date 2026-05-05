@@ -1,0 +1,40 @@
+CREATE DATABASE SalesDB;
+USE SalesDB;
+
+CREATE TABLE Sales (
+    sale_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(100),
+    quantity INT,
+    price DECIMAL(10,2),
+    total DECIMAL(10,2)
+);
+
+DELIMITER //
+CREATE PROCEDURE AddSale(
+    IN p_name VARCHAR(100),
+    IN p_qty INT,
+    IN p_price DECIMAL(10,2)
+)
+BEGIN
+    DECLARE total_amount DECIMAL(10,2);
+    SET total_amount = p_qty * p_price;
+    INSERT INTO Sales (product_name, quantity, price, total) VALUES (p_name, p_qty, p_price, total_amount);
+END //
+DELIMITER ;
+
+CALL AddSale('Laptop', 2, 50000.00);
+CALL AddSale('Mouse', 5, 500.00);
+
+DELIMITER //
+CREATE FUNCTION GetTotalSales() 
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+    DECLARE total_sales DECIMAL(10,2);
+    SELECT SUM(total) INTO total_sales FROM Sales;
+    RETURN IFNULL(total_sales, 0.00);
+END //
+DELIMITER ;
+
+SELECT * FROM Sales;
+SELECT GetTotalSales() AS Total_Sales;
