@@ -1,0 +1,85 @@
+CREATE DATABASE EmployeeDB;
+USE EmployeeDB;
+
+CREATE TABLE Employees (
+    emp_id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_name VARCHAR(100),
+    department VARCHAR(50),
+    salary DECIMAL(10,2)
+);
+
+CREATE TABLE Employee_Audit (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_id INT,
+    action_type VARCHAR(10),
+    old_salary DECIMAL(10,2),
+    new_salary DECIMAL(10,2),
+    action_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DELIMITER //
+CREATE TRIGGER trg_emp_insert
+AFTER INSERT ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Employee_Audit(emp_id, action_type, new_salary)
+    VALUES (NEW.emp_id, 'INSERT', NEW.salary);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER trg_emp_update
+AFTER UPDATE ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Employee_Audit(emp_id, action_type, old_salary, new_salary)
+    VALUES (OLD.emp_id, 'UPDATE', OLD.salary, NEW.salary);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER trg_emp_delete
+AFTER DELETE ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Employee_Audit(emp_id, action_type, old_salary)
+    VALUES (OLD.emp_id, 'DELETE', OLD.salary);
+END //
+DELIMITER ;
+
+INSERT INTO Employees(emp_name, department, salary)
+VALUES
+('Amit', 'IT', 50000),
+('Neha', 'HR', 40000),
+('Rahul', 'IT', 60000);
+
+DELIMITER //
+CREATE PROCEDURE Update_IT_Salary()
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE v_emp_id INT;
+    DECLARE v_salary DECIMAL(10,2);
+
+    DECLARE emp_cursor CURSOR FOR 
+    SELECT emp_id, salary FROM Employees WHERE department = 'IT';
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    OPEN emp_cursor;
+    read_loop: LOOP
+        FETCH emp_cursor INTO v_emp_id, v_salary;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        UPDATE Employees 
+        SET salary = v_salary * 1.10 
+        WHERE emp_id = v_emp_id;
+    END LOOP;
+    CLOSE emp_cursor;
+END //
+DELIMITER ;
+
+CALL Update_IT_Salary();
+SELECT * FROM Employees;
+SELECT * FROM Employee_Audit;
