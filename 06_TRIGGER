@@ -1,0 +1,51 @@
+CREATE DATABASE EmployeeDB;
+USE EmployeeDB;
+
+CREATE TABLE Employees (
+    emp_id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_name VARCHAR(100),
+    department VARCHAR(50),
+    salary DECIMAL(10,2)
+);
+
+CREATE TABLE Employee_Audit (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_id INT,
+    action_type VARCHAR(10),
+    old_salary DECIMAL(10,2),
+    new_salary DECIMAL(10,2),
+    action_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DELIMITER //
+CREATE TRIGGER trg_emp_insert
+AFTER INSERT ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Employee_Audit(emp_id, action_type, new_salary)
+    VALUES (NEW.emp_id, 'INSERT', NEW.salary);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER trg_emp_update
+AFTER UPDATE ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Employee_Audit(emp_id, action_type, old_salary, new_salary)
+    VALUES (OLD.emp_id, 'UPDATE', OLD.salary, NEW.salary);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER trg_emp_delete
+AFTER DELETE ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Employee_Audit(emp_id, action_type, old_salary)
+    VALUES (OLD.emp_id, 'DELETE', OLD.salary);
+END //
+DELIMITER ;
+
+SELECT * FROM Employees;
+SELECT * FROM Employee_Audit;
