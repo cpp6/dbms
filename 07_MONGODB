@@ -1,0 +1,26 @@
+use studentdb
+
+db.createCollection("users")
+
+db.users.insertOne({
+  name: "Kiran",
+  age: 28,
+  department: "Engineering",
+  sales: 500
+});
+
+db.users.insertMany([
+  { name: "Amit", age: 34, department: "Sales", sales: 1200},
+  { name: "Neha", age: 22, department: "Engineering", sales: 300},
+  { name: "Uday", age: 40, department: "Sales", sales: 2500}
+]);
+
+db.users.find({ department: "Sales" });
+db.users.findOne({ name: "Kiran" });
+
+db.users.updateOne(
+  { name: "Kiran" }, 
+  { $set: { sales: 1500 } }
+);
+
+db.users.deleteOne({ name: "Amit" });
