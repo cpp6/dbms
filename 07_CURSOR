@@ -1,4 +1,4 @@
-CREATE DATABAS EmployeeDB;
+CREATE DATABASE EmployeeDB;
 USE EmployeeDB;
 
 CREATE TABLE Employees (
