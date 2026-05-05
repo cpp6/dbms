@@ -47,5 +47,12 @@ BEGIN
 END //
 DELIMITER ;
 
+INSERT INTO Employees (emp_name, department, salary) 
+VALUES ('Arjun Mehta', 'IT', 60000), ('Sanya Iyer', 'HR', 45000);
+
+UPDATE Employees SET salary = 65000 WHERE emp_name = 'Arjun Mehta';
+
+DELETE FROM Employees WHERE emp_name = 'Sanya Iyer';
+
 SELECT * FROM Employees;
 SELECT * FROM Employee_Audit;
