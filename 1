@@ -61,3 +61,22 @@ SELECT * FROM student;
 SELECT * FROM instructor;
 SELECT * FROM course;
 SELECT * FROM enrollment;
+
+SELECT c.CourseName, Instructor.Name AS Instructor
+FROM Course
+JOIN Instructor ON Course.InstructorID = Instructor.InstructorID;
+
+SELECT Student.Name, Course.CourseName
+FROM Enrollment
+JOIN Student ON Enrollment.StudentID = Student.StudentID
+JOIN Course ON Enrollment.CourseID = Course.CourseID;
+
+SELECT CourseName, COUNT(StudentID) AS TotalStudents
+FROM Enrollment
+JOIN Course ON Enrollment.CourseID = Course.CourseID
+GROUP BY CourseName;
+
+SELECT CourseName
+FROM Enrollment
+JOIN Course ON Enrollment.CourseID = Course.CourseID
+WHERE StudentID = 1301;
